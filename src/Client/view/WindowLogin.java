@@ -135,11 +135,13 @@ public class WindowLogin extends JFrame {
 //				Xu ly du lieu nhan ve
 				JsonObject jobj = new Gson().fromJson(resultString, JsonObject.class);
 				String type = jobj.get("type").toString();
-				if (MainServer.removeNgoac(type)=="error") {
+				if (MainServer.removeNgoac(type).equals("error")) {
 					wrongPassError.setVisible(true);
 				}else {
+					wrongPassError.setVisible(false);
 					JOptionPane.showMessageDialog(null, "Đăng nhập thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-					
+					new MainChat().show();
+					hide();
 				}
 			}
 		});

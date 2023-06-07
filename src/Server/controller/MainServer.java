@@ -121,8 +121,8 @@ public class MainServer {
 	
 	public void Login (Account acc, DataOutputStream sentToUser) {
 		Account account = new AccountDB().selectById(acc.getPhone());
-//		tipe tucc tai day
-		if (account.getPassword()!= mahoamotchieu(acc.getPassword())) {
+		
+		if (!account.getPassword().equals(mahoamotchieu(acc.getPassword()))) {
 			String datatoUser = new processData().processError("error", "WrongPass");
 			try {
 				sentToUser.writeUTF(datatoUser);
@@ -159,6 +159,7 @@ public class MainServer {
 		        return null;
 		    }
 	}
+//	public void closeServer ()
 	public static void main(String[] args) {
 		new MainServer();
 	}
