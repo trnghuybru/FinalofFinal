@@ -60,7 +60,12 @@ public class MainServer {
 									Register(account, dataOutputStream);
 								break;
 								
-							default:
+								case "DAOsLogin":
+									String phoneLogin = removeNgoac(jobj.getAsJsonObject("data").get("phone").toString());
+									String passwordLogin = removeNgoac(jobj.getAsJsonObject("data").get("password").toString());
+									Account accLogin = new Account(phoneLogin, passwordLogin);
+									//Thuc hien dang nhap
+									Login(accLogin, dataOutputStream);
 								break;
 							
 							}
@@ -94,7 +99,7 @@ public class MainServer {
 //		String String = account.toString();
 //		System.out.println(String);
 		if (account!=null) {
-			String dataToUser = new processData().processRegisterError("error", "ExistedPhone");
+			String dataToUser = new processData().processError("error", "ExistedPhone");
 			try {
 				sendToUser.writeUTF(dataToUser);
 			} catch (IOException e) {
@@ -102,7 +107,7 @@ public class MainServer {
 				e.printStackTrace();
 			}
 		}else {
-			String dataToUser = new processData().processRegisterError("success", "Register Successfull");
+			String dataToUser = new processData().processError("success", "Register Successful");
 			try {
 				sendToUser.writeUTF(dataToUser);
 			} catch (IOException e) {
@@ -111,6 +116,28 @@ public class MainServer {
 			}
 			Account coppyAccount = new Account(acc.getUsername(), mahoamotchieu(acc.getPassword()), acc.getPhone(), acc.getEmail());
 			AccountDB.getInstance().insert(coppyAccount);
+		}
+	}
+	
+	public void Login (Account acc, DataOutputStream sentToUser) {
+		Account account = new AccountDB().selectById(acc.getPhone());
+//		tipe tucc tai day
+		if (account.getPassword()!= mahoamotchieu(acc.getPassword())) {
+			String datatoUser = new processData().processError("error", "WrongPass");
+			try {
+				sentToUser.writeUTF(datatoUser);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			String datatoUser = new processData().processError("success", "Login Successful");
+			try {
+				sentToUser.writeUTF(datatoUser);
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
 		}
 	}
 	// Xu ly ngoac kep

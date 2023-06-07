@@ -11,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import Client.model.Account;
 import Server.controller.MainServer;
 
 import javax.swing.JLabel;
@@ -29,7 +30,6 @@ public class WindowLogin extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField txtPhoneLogin;
-	private JTextField txtPassLogin;
 	private JTextField txtPhoneRegister;
 	private JTextField txtUsername;
 	private JTextField txtEmail;
@@ -38,6 +38,8 @@ public class WindowLogin extends JFrame {
 	private JLabel confirmPassError;
 	private JPanel registerPanel;
 	private JLabel exitsPhoneError;
+	private JPasswordField txtPassLogin;
+	private JLabel wrongPassError;
 
 	/**
 	 * Launch the application.
@@ -95,7 +97,7 @@ public class WindowLogin extends JFrame {
 		JPanel loginPanel = new JPanel();
 		loginPanel.setLayout(null);
 		loginPanel.setBackground(Color.WHITE);
-		panel_1.add(loginPanel, "name_2110445875815200");
+		panel_1.add(loginPanel, "login_panel");
 		
 		JLabel lblNewLabel_1 = new JLabel("Login");
 		lblNewLabel_1.setFont(new Font("Segoe UI", Font.BOLD, 32));
@@ -117,11 +119,6 @@ public class WindowLogin extends JFrame {
 		lblNewLabel_2_1.setBounds(79, 279, 127, 22);
 		loginPanel.add(lblNewLabel_2_1);
 		
-		txtPassLogin = new JTextField();
-		txtPassLogin.setColumns(10);
-		txtPassLogin.setBounds(79, 302, 365, 38);
-		loginPanel.add(txtPassLogin);
-		
 		JButton btnLoginmain = new JButton("Login");
 		btnLoginmain.setBorder(null);
 		btnLoginmain.setForeground(new Color(255, 255, 255));
@@ -129,6 +126,21 @@ public class WindowLogin extends JFrame {
 		btnLoginmain.setFont(new Font("Segoe UI", Font.BOLD, 18));
 		btnLoginmain.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String phone = txtPhoneLogin.getText();
+				String password = new String(txtPassLogin.getPassword());
+				//Tao doi tuong processData de xu ly du lieu
+				processData processData = new processData();
+				String request = processData.processLogin(phone, password);
+				String resultString = new sendRequest().Fetch(request, "localhost", 3000);
+//				Xu ly du lieu nhan ve
+				JsonObject jobj = new Gson().fromJson(resultString, JsonObject.class);
+				String type = jobj.get("type").toString();
+				if (MainServer.removeNgoac(type)=="error") {
+					wrongPassError.setVisible(true);
+				}else {
+					JOptionPane.showMessageDialog(null, "Đăng nhập thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+					
+				}
 			}
 		});
 		btnLoginmain.setBounds(79, 370, 365, 46);
@@ -152,6 +164,17 @@ public class WindowLogin extends JFrame {
 			}
 		});
 		loginPanel.add(btnRegister);
+		
+		txtPassLogin = new JPasswordField();
+		txtPassLogin.setBounds(79, 308, 365, 38);
+		loginPanel.add(txtPassLogin);
+		
+		wrongPassError = new JLabel("Wrong password");
+		wrongPassError.setVisible(false);
+		wrongPassError.setForeground(new Color(255, 0, 0));
+		wrongPassError.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		wrongPassError.setBounds(346, 281, 98, 22);
+		loginPanel.add(wrongPassError);
 		
 		registerPanel = new JPanel();
 		registerPanel.setOpaque(false);
@@ -200,13 +223,14 @@ public class WindowLogin extends JFrame {
 					String resultString = new sendRequest().Fetch(request, "localhost", 3000);
 //					Kiem tra xem co nhan duoc du lieu tu server khong
 					System.out.println(resultString);
+//					Xu ly du lieu nhan ve tu server
 					JsonObject jobj = new Gson().fromJson(resultString, JsonObject.class);
 					String type = jobj.get("type").toString();
 					System.out.println(type);
 					if(MainServer.removeNgoac(type).equals("error")) {
 						exitsPhoneError.setVisible(true);
 					} else {
-						JOptionPane.showMessageDialog(null, "Đăng nhập thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Đăng kí thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}
 			}
@@ -224,7 +248,7 @@ public class WindowLogin extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-//				Ngày 6/6/2023 Tiếp tục làm tại đây. 
+				cardLayout.show(panel_1, "login_panel");
 			}
 		});
 		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 12));

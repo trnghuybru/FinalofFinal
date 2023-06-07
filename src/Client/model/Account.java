@@ -39,6 +39,13 @@ public class Account {
 	}
 	
 	
+	
+	
+	public Account(String phone, String password) {
+		this.password = password;
+		this.phone = phone;
+	}
+	
 	@Override
 	public String toString() {
 		return "Account [username=" + username + ", password=" + password + ", phone=" + phone + ", email=" + email
