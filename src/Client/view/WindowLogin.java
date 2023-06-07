@@ -56,7 +56,10 @@ public class WindowLogin extends JFrame {
 			}
 		});
 	}
-
+	 public static void showWindow() {
+	    	WindowLogin frame = new WindowLogin();
+	        frame.setVisible(true);
+	    }
 	/**
 	 * Create the frame.
 	 */
