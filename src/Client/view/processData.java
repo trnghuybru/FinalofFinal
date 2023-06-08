@@ -15,4 +15,8 @@ public class processData {
 				+ "\"data\": {\"phone\": \""+phone+"\" , \"password\": \""+password+"\"}}";
 		return jsonString;
 	}
+	public String prosessIpPort (String ServerIp, int port) {
+		String jsonString = "{\"serverIP\": \""+ServerIp+"\", \"port\": \""+port+"\"}";
+		return jsonString;
+	}
 }

@@ -23,6 +23,8 @@ import javax.swing.JTextField;
 import java.awt.CardLayout;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.awt.event.ActionEvent;
 import javax.swing.JPasswordField;
 
@@ -40,6 +42,8 @@ public class WindowLogin extends JFrame {
 	private JLabel exitsPhoneError;
 	private JPasswordField txtPassLogin;
 	private JLabel wrongPassError;
+	private JTextField txtServerIP;
+	private JTextField txtPort;
 
 	/**
 	 * Launch the application.
@@ -97,6 +101,66 @@ public class WindowLogin extends JFrame {
 		contentPane.add(panel_1);
 		panel_1.setLayout(cardLayout);
 		
+		JPanel ServerIPpanel = new JPanel();
+		ServerIPpanel.setBackground(new Color(255, 255, 255));
+		panel_1.add(ServerIPpanel, "ServerIPpanel");
+		ServerIPpanel.setLayout(null);
+		
+		txtServerIP = new JTextField();
+		txtServerIP.setText("192.168.1.143");
+		txtServerIP.setColumns(10);
+		txtServerIP.setBounds(83, 283, 169, 38);
+		ServerIPpanel.add(txtServerIP);
+		
+		JLabel lblNewLabel_2_3 = new JLabel("ServerIP");
+		lblNewLabel_2_3.setFont(new Font("Segoe UI", Font.BOLD, 16));
+		lblNewLabel_2_3.setBounds(83, 260, 127, 22);
+		ServerIPpanel.add(lblNewLabel_2_3);
+		
+		JLabel lblNewLabel_2_3_1 = new JLabel("Port");
+		lblNewLabel_2_3_1.setFont(new Font("Segoe UI", Font.BOLD, 16));
+		lblNewLabel_2_3_1.setBounds(262, 260, 73, 22);
+		ServerIPpanel.add(lblNewLabel_2_3_1);
+		
+		txtPort = new JTextField();
+		txtPort.setColumns(10);
+		txtPort.setBounds(262, 283, 186, 38);
+		ServerIPpanel.add(txtPort);
+		
+		JLabel portError = new JLabel("Can't find port");
+		portError.setVisible(false);
+		portError.setForeground(Color.RED);
+		portError.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		portError.setBounds(366, 260, 82, 22);
+		ServerIPpanel.add(portError);
+		
+		JButton btnNext = new JButton("NEXT ->");
+		btnNext.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		btnNext.setForeground(new Color(255, 255, 255));
+		btnNext.setBorder(null);
+		btnNext.setBackground(new Color(0, 0, 0));
+		btnNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+//				System.out.println(port);
+				boolean b=true;
+				try {
+					String test=new sendRequest().Fetch("{'method':\"\"}",txtServerIP.getText(),Integer.parseInt(txtPort.getText()));
+				}
+				catch(Exception exception) {
+					b=false;
+				}
+				if(b) {
+				cardLayout.show(panel_1, "login_panel");
+				}
+				else {
+					portError.setVisible(true);
+				}
+			}
+		});
+		btnNext.setBounds(335, 359, 113, 38);
+		ServerIPpanel.add(btnNext);
+		
 		JPanel loginPanel = new JPanel();
 		loginPanel.setLayout(null);
 		loginPanel.setBackground(Color.WHITE);
@@ -104,22 +168,22 @@ public class WindowLogin extends JFrame {
 		
 		JLabel lblNewLabel_1 = new JLabel("Login");
 		lblNewLabel_1.setFont(new Font("Segoe UI", Font.BOLD, 32));
-		lblNewLabel_1.setBounds(218, 116, 98, 52);
+		lblNewLabel_1.setBounds(221, 87, 98, 52);
 		loginPanel.add(lblNewLabel_1);
 		
 		JLabel lblNewLabel_2 = new JLabel("Phone Number");
 		lblNewLabel_2.setFont(new Font("Segoe UI", Font.BOLD, 16));
-		lblNewLabel_2.setBounds(79, 195, 127, 22);
+		lblNewLabel_2.setBounds(82, 166, 127, 22);
 		loginPanel.add(lblNewLabel_2);
 		
 		txtPhoneLogin = new JTextField();
 		txtPhoneLogin.setColumns(10);
-		txtPhoneLogin.setBounds(79, 218, 365, 38);
+		txtPhoneLogin.setBounds(82, 189, 365, 38);
 		loginPanel.add(txtPhoneLogin);
 		
 		JLabel lblNewLabel_2_1 = new JLabel("Password");
 		lblNewLabel_2_1.setFont(new Font("Segoe UI", Font.BOLD, 16));
-		lblNewLabel_2_1.setBounds(79, 279, 127, 22);
+		lblNewLabel_2_1.setBounds(82, 250, 127, 22);
 		loginPanel.add(lblNewLabel_2_1);
 		
 		JButton btnLoginmain = new JButton("Login");
@@ -134,7 +198,16 @@ public class WindowLogin extends JFrame {
 				//Tao doi tuong processData de xu ly du lieu
 				processData processData = new processData();
 				String request = processData.processLogin(phone, password);
-				String resultString = new sendRequest().Fetch(request, "localhost", 3000);
+				String resultString = null;
+				try {
+					resultString = new sendRequest().Fetch(request, txtServerIP.getText(), Integer.parseInt(txtPort.getText()));
+				} catch (NumberFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 //				Xu ly du lieu nhan ve
 				JsonObject jobj = new Gson().fromJson(resultString, JsonObject.class);
 				String type = jobj.get("type").toString();
@@ -148,19 +221,19 @@ public class WindowLogin extends JFrame {
 				}
 			}
 		});
-		btnLoginmain.setBounds(79, 370, 365, 46);
+		btnLoginmain.setBounds(82, 352, 365, 46);
 		loginPanel.add(btnLoginmain);
 		
 		JLabel lblNewLabel_3 = new JLabel("Don't have account ?");
 		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblNewLabel_3.setBounds(79, 439, 127, 13);
+		lblNewLabel_3.setBounds(82, 416, 127, 13);
 		loginPanel.add(lblNewLabel_3);
 		
 		JButton btnRegister = new JButton("Register");
 		btnRegister.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnRegister.setBackground(new Color(255, 255, 255));
 		btnRegister.setBorder(null);
-		btnRegister.setBounds(199, 435, 62, 21);
+		btnRegister.setBounds(202, 412, 62, 21);
 		btnRegister.addActionListener(new ActionListener() {
 			
 			@Override
@@ -171,15 +244,16 @@ public class WindowLogin extends JFrame {
 		loginPanel.add(btnRegister);
 		
 		txtPassLogin = new JPasswordField();
-		txtPassLogin.setBounds(79, 308, 365, 38);
+		txtPassLogin.setBounds(82, 279, 365, 38);
 		loginPanel.add(txtPassLogin);
 		
 		wrongPassError = new JLabel("Wrong password");
 		wrongPassError.setVisible(false);
 		wrongPassError.setForeground(new Color(255, 0, 0));
 		wrongPassError.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		wrongPassError.setBounds(346, 281, 98, 22);
+		wrongPassError.setBounds(349, 252, 98, 22);
 		loginPanel.add(wrongPassError);
+		
 		
 		registerPanel = new JPanel();
 		registerPanel.setOpaque(false);
@@ -225,7 +299,13 @@ public class WindowLogin extends JFrame {
 				} else {
 					processData processData = new processData();
 					String request = processData.processRegister(user, pass, phone, email);
-					String resultString = new sendRequest().Fetch(request, "localhost", 3000);
+					String resultString = null;
+					try {
+						resultString = new sendRequest().Fetch(request, txtServerIP.getText(), Integer.parseInt(txtPort.getText()));
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 //					Kiem tra xem co nhan duoc du lieu tu server khong
 					System.out.println(resultString);
 //					Xu ly du lieu nhan ve tu server
@@ -308,5 +388,6 @@ public class WindowLogin extends JFrame {
 		exitsPhoneError.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		exitsPhoneError.setBounds(367, 324, 78, 13);
 		registerPanel.add(exitsPhoneError);
+		
 	}
 }

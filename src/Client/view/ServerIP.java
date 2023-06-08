@@ -6,11 +6,18 @@ import java.awt.Image;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.PublicKey;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
+
+import com.mysql.cj.protocol.a.result.ResultsetRowsStatic;
+
+import Server.controller.MainServer;
+
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTextField;
@@ -22,10 +29,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerIP extends JFrame {
-
+	public static int port;
+	public static String ip;
 	private JPanel contentPane;
 	private JTextField txtport;
-	private JTextField txtidsv;
+	public JTextField txtidsv;
 
 	/**
 	 * Launch the application.
@@ -117,8 +125,9 @@ public class ServerIP extends JFrame {
 		btnstart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				 int port = Integer.parseInt(txtport.getText());
-	                String ip = txtidsv.getText();
+				 	port = Integer.parseInt(txtport.getText());
+				 	ip = txtidsv.getText();
+				 	new MainServer(port);
 //	                startServer(ip, port);
 	                btnstart.setEnabled(false);
 //	                WindowLogin.showWindow();
@@ -233,11 +242,11 @@ public class ServerIP extends JFrame {
             return "127.0.0.1"; // Default to loopback address
         }
     }
-	public static int getPort(JTextField txtidsv) {
-        String inputText = txtidsv.getText().trim();
-        int port = Integer.parseInt(inputText);
-        return port;
-    }
+//	
+	public static int getPort() {
+		return port;
+		
+	}
 }
 
 

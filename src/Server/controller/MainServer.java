@@ -13,15 +13,16 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import Client.model.Account;
+import Client.view.ServerIP;
 import Client.view.processData;
 import Client.view.sendRequest;
 import DAOs.AccountDB;
 import DAOs.Condb;
 
 public class MainServer {
-	public final static int port = 3000;
+//	public final static int port = ServerIP.port;
 	
-	public MainServer() {
+	public MainServer(int port) {
 		// TODO Auto-generated constructor stub
 		try {
 			ServerSocket serverSocket = new ServerSocket(port);
@@ -48,6 +49,10 @@ public class MainServer {
 								String checkMethod = removeNgoac(method);
 //								System.out.println(checkMethod);
 							switch (checkMethod) {
+								case "": 
+									dataOutputStream.writeUTF("");
+								break;
+					
 								case "DAOsRegister":
 									String username = 	removeNgoac(jobj.getAsJsonObject("data").get("username").toString());
 									String password = 	removeNgoac(jobj.getAsJsonObject("data").get("password").toString());
@@ -160,7 +165,7 @@ public class MainServer {
 		    }
 	}
 //	public void closeServer ()
-	public static void main(String[] args) {
-		new MainServer();
-	}
+//	public static void main(String[] args) {
+//		new MainServer();
+//	}
 }
