@@ -156,7 +156,7 @@ public class WindowLogin extends JFrame {
 				if(b) {
 					cardLayout.show(panel_1, "login_panel");
 //					Tạo file lưu port
-					File file = new File("src/Client/view/ServerIP");
+					File file = new File("src/Client/view/ServerIP.txt");
 					String serverIP = txtServerIP.getText();
 					int port = Integer.parseInt(txtPort.getText());
 
