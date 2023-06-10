@@ -8,15 +8,20 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import Client.model.Account;
+import Client.model.AccountList;
 import Client.view.ServerIP;
 import Client.view.processData;
 import Client.view.sendRequest;
 import DAOs.AccountDB;
+import DAOs.AccountListDB;
 import DAOs.Condb;
 
 public class MainServer {
@@ -70,7 +75,10 @@ public class MainServer {
 									String passwordLogin = removeNgoac(jobj.getAsJsonObject("data").get("password").toString());
 									Account accLogin = new Account(phoneLogin, passwordLogin);
 									//Thuc hien dang nhap
-									Login(accLogin, dataOutputStream);
+									Login(accLogin, dataOutputStream, port);
+									
+								case "DAOsQuerryPhoneBook": 
+									QuerryPhoneBook(port,dataOutputStream);
 								break;
 							
 							}
@@ -81,6 +89,8 @@ public class MainServer {
 							e.printStackTrace();
 						} finally {
 							try {
+//								dataInputStream.close();
+//								dataOutputStream.close();
 								socket.close();
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
@@ -124,9 +134,17 @@ public class MainServer {
 		}
 	}
 	
-	public void Login (Account acc, DataOutputStream sentToUser) {
-		Account account = new AccountDB().selectById(acc.getPhone());
-		
+	public void Login (Account acc, DataOutputStream sentToUser, int port) {
+		Account account = AccountDB.getInstance().selectById(acc.getPhone());
+		if (account==null) {
+			String datatoUser = new processData().processError("error", "WrongPass");
+			try {
+				sentToUser.writeUTF(datatoUser);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		if (!account.getPassword().equals(mahoamotchieu(acc.getPassword()))) {
 			String datatoUser = new processData().processError("error", "WrongPass");
 			try {
@@ -137,6 +155,8 @@ public class MainServer {
 			}
 		} else {
 			String datatoUser = new processData().processError("success", "Login Successful");
+			AccountList accList = new AccountList(account.getUsername(), account.getPhone(),port, randomID());
+			AccountListDB.getInstance().insert(accList);
 			try {
 				sentToUser.writeUTF(datatoUser);
 			} catch (Exception e) {
@@ -144,6 +164,24 @@ public class MainServer {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void QuerryPhoneBook(int port,DataOutputStream senttoUser) {
+		ArrayList<AccountList> accountLists = AccountListDB.getInstance().selectUserPhoneBook(port);
+		ArrayList<String> usernameList = new ArrayList<String>();
+		for (AccountList account : accountLists) {
+		    String username = account.getUsername();
+		    usernameList.add(username);
+		}
+		String datatoUser = new processData().processPhoneBooktoUser(usernameList);
+		System.out.println(datatoUser);
+		try {
+			senttoUser.writeUTF(datatoUser);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	// Xu ly ngoac kep
 	public static String removeNgoac(String input) {
@@ -163,6 +201,32 @@ public class MainServer {
 		        e.printStackTrace();
 		        return null;
 		    }
+	}
+//	ham tao ID Random
+	public static int randomID() {
+		boolean check=false;
+		double randomDouble;
+		int random;
+		do {
+			check=false;
+			randomDouble = Math.random();
+			randomDouble = randomDouble*9999+1;
+			random = (int)randomDouble;
+			String sql1= "SELECT IDList FROM accountlist ";
+			try {
+				Connection connection = Condb.getConnection();
+				Statement statement = connection.createStatement();
+				ResultSet rs = statement.executeQuery(sql1);
+				while (rs.next()) {
+					if (rs.getInt(1)==random) {
+						check=true;
+					}
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		} while (check==true);
+		return random;
 	}
 //	public void closeServer ()
 //	public static void main(String[] args) {

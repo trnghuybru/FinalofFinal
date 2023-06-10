@@ -23,6 +23,9 @@ import javax.swing.JTextField;
 import java.awt.CardLayout;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.awt.event.ActionEvent;
@@ -151,7 +154,21 @@ public class WindowLogin extends JFrame {
 					b=false;
 				}
 				if(b) {
-				cardLayout.show(panel_1, "login_panel");
+					cardLayout.show(panel_1, "login_panel");
+//					Tạo file lưu port
+					File file = new File("src/Client/view/ServerIP");
+					String serverIP = txtServerIP.getText();
+					int port = Integer.parseInt(txtPort.getText());
+
+					try {
+					    FileWriter writer = new FileWriter(file);
+					    writer.write("Server IP: " + serverIP + "\n");
+					    writer.write("Port: " + port + "\n");
+					    writer.close();
+					    System.out.println("File đã được tạo và lưu thông tin thành công.");
+					} catch (IOException e1) {
+					    System.out.println("Lỗi khi tạo và lưu file: " + e1.getMessage());
+					}
 				}
 				else {
 					portError.setVisible(true);
@@ -212,13 +229,14 @@ public class WindowLogin extends JFrame {
 				JsonObject jobj = new Gson().fromJson(resultString, JsonObject.class);
 				String type = jobj.get("type").toString();
 				if (MainServer.removeNgoac(type).equals("error")) {
-					wrongPassError.setVisible(true);
+					JOptionPane.showMessageDialog(null, "Đăng nhập không thành công do sai mật khẩu hoặc tài khoản chưa được đăng kí", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
 				}else {
 					wrongPassError.setVisible(false);
 					JOptionPane.showMessageDialog(null, "Đăng nhập thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
 					new MainChat().show();
 					hide();
 				}
+				
 			}
 		});
 		btnLoginmain.setBounds(82, 352, 365, 46);

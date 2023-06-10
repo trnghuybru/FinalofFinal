@@ -7,6 +7,7 @@ public class Account {
 	private String email;
 	
 	
+	
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -38,13 +39,18 @@ public class Account {
 		this.email = email;
 	}
 	
-	
+	public Account(String username, String password, String phone) {
+		this.username = username;
+		this.password = password;
+		this.phone = phone;
+	}
 	
 	
 	public Account(String phone, String password) {
 		this.password = password;
 		this.phone = phone;
 	}
+	
 	
 	@Override
 	public String toString() {
